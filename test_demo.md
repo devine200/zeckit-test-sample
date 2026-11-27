@@ -36,47 +36,27 @@ The repository includes an `example-app/` directory. You can test your local `Ze
 
 ---
 
-## Method 2: Seamless Dual-Linkage (For 'act' or Local Workflows)
+## Run the checked-in CI workflow with `act`
 
-This allows you to test the actual GitHub Actions YAML using your local code.
+From the sample repository root, run:
 
-1.  **Activate Local Linkage**:
-    ```bash
-    ./link-local.sh
-    ```
-    *This creates a symlink to your local ZecKit project. The workflows are configured to detect and prioritize this link.*
+```bash
+act -W .github/workflows/ci.yml
+```
 
-2.  **Run with `act`**:
-    ```bash
-    act -W .github/workflows/ci.yml
-    ```
-
-3.  **Deactivate (Optional)**:
-    If you want to revert to testing the remote repository version:
-    ```bash
-    rm .zeckit-action
-    ```
+This workflow uses the remote ZecKit action at `intelliDean/ZecKit@feat/nu6-upgrade`.
 
 ---
 
-## Method 3: Running the Example App Manually
+## Run the suite against a local ZecKit checkout
 
-If you want to iterate on the application code itself while the devnet is running:
+With ZecKit checked out at `../ZecKit`, run this command from the sample repository root.
+It rebuilds the CLI, clears the previous devnet state, starts the selected backend,
+and runs both the CLI tests and the example application.
 
-1.  **Start the devnet** (in one terminal):
-    ```bash
-    ./test-local.sh zaino
-    ```
-    *Wait until you see "Starting E2E tests..."*
-
-2.  **Run the app** (in a second terminal):
-    ```bash
-    cd example-app
-    npm install   # Only needed once
-    npm start
-    ```
-
----
+```bash
+./test-local.sh zaino
+```
 
 ---
 

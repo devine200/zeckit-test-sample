@@ -8,13 +8,10 @@ Move the contents of this folder to a new repository and push to GitHub.
 The workflows run immediately without any extra configuration beyond a
 `GITHUB_TOKEN` with `read:packages` scope (which every repo already has).
 
-> **Note:** Workflows now reference a local checkout of `intelliDean/ZecKit@feat/standalone-cli` 
-> for consistent testing of the action during development.
->
-> To test your local changes in the `ZecKit` project, you can use the provided script:
-> ```bash
-> ./test-local.sh [lwd|zaino]
-> ```
+The normal CI and failure-drill workflows use `intelliDean/ZecKit@feat/nu6-upgrade`.
+The separate `zeckit-e2e.yml` workflow uses `intelliDean/ZecKit@m3-implementation`.
+To test changes in a sibling `../ZecKit` checkout, run `./test-local.sh zaino`
+or `./test-local.sh lwd` from this repository. The runner clears the existing devnet state before starting.
 
 ---
 
@@ -35,7 +32,7 @@ Runs on every push / PR to `main`.
 This repository includes a functional Node.js application that demonstrates how to connect to the ZecKit Devnet.
 
 - **Automated**: The `happy-path` CI job and `./test-local.sh` automatically execute this app to verify the network.
-- **Manual**: You can run it yourself to test the connection (see [demo.md](./demo.md)).
+- For a manual run, follow the [local demo](./test_demo.md).
 
 ### [`failure-drill.yml`](.github/workflows/failure-drill.yml) — Artifact Verification
 
@@ -69,7 +66,7 @@ CI kicks off automatically on push. No secrets need to be added —
 ## How to Configure Inputs
 
 ```yaml
-- uses: intelliDean/ZecKit@feat/standalone-cli   # → zecdev/ZecKit@v1 after merge
+- uses: intelliDean/ZecKit@feat/nu6-upgrade
   with:
     backend:                 lwd          # 'lwd' or 'zaino'
     startup_timeout_minutes: '15'         # default 10
@@ -81,7 +78,7 @@ CI kicks off automatically on push. No secrets need to be added —
     ghcr_token:              ${{ secrets.GITHUB_TOKEN }}
 ```
 
-Full reference → [ZecKit README](https://github.com/intelliDean/ZecKit/blob/feat/standalone-cli/README.md)
+Full reference in the [ZecKit README](https://github.com/intelliDean/ZecKit/blob/feat/nu6-upgrade/README.md).
 
 ---
 
@@ -128,4 +125,4 @@ is broken. Check the action version and `upload_artifacts` input.
 | Artifacts not uploaded | Ensure `ghcr_token` has `read:packages` scope |
 | Drill assert fails | Artifact collection broken; check action version |
 
-Full troubleshooting → [ZecKit README Troubleshooting](https://github.com/intelliDean/ZecKit/blob/feat/standalone-cli/README.md#troubleshooting)
+More troubleshooting guidance is in the [ZecKit README](https://github.com/intelliDean/ZecKit/blob/feat/nu6-upgrade/README.md).

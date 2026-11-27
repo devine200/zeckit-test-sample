@@ -1,12 +1,7 @@
 /**
  * ZecKit Devnet "Happy Path" Example
- * 
- * This script demonstrates how a downstream application interacts with the local
- * ZecKit Regtest Cluster. It checks the Faucet's balance, requests funds to a random
- * Unified Address (UA), and proves the blockchain is functioning properly.
- * 
- * Prerequisites: You must have the ZecKit Devnet running in the background.
- * Run `cargo run -- up` from the top level `cli` directory first.
+ * Read the local faucet balance, send 0.1 regtest ZEC to the faucet's own
+ * unified address, and print the transaction ID returned by the faucet.
  */
 
 const FAUCET_API = "http://127.0.0.1:8080";
@@ -29,13 +24,16 @@ async function runHappyPath() {
         console.log(`   - Transparent Balance: ${stats.transparent_balance} ZEC`);
         console.log(`   - Orchard Balance:    ${stats.orchard_balance} ZEC\n`);
 
-        // 2. We will need a Unified Address to receive funds.
-        // For this demo, let's ask the faucet what its own Unified address is.
-        // In a real app, this would be your user's wallet address.
         const addrResponse = await fetch(`${FAUCET_API}/address`);
+        if (!addrResponse.ok) {
+            throw new Error(`Faucet /address returned HTTP ${addrResponse.status}`);
+        }
         const { unified_address } = await addrResponse.json();
+        if (typeof unified_address !== 'string' || !unified_address.trim()) {
+            throw new Error('Faucet /address returned no unified address');
+        }
 
-        console.log("📬 2. Receiver Address Identifed!");
+        console.log("📬 2. Receiver address identified");
         console.log(`   UA: ${unified_address.substring(0, 30)}...\n`);
 
         // 3. Send Funds
@@ -52,19 +50,17 @@ async function runHappyPath() {
             })
         });
 
+        if (!sendResponse.ok) {
+            throw new Error(`Faucet /send returned HTTP ${sendResponse.status}`);
+        }
         const sendResult = await sendResponse.json();
-
-        if (sendResult.txid) {
-            console.log(`✅ Success! Transaction injected into the Devnet Mempool.`);
-            console.log(`📜 TXID: ${sendResult.txid}`);
-            console.log(`   Status: ${sendResult.status}\n`);
-        } else {
-            console.log("⚠️ Transaction failed. Do you have enough Orchard funds?");
-            console.log("   Wait for the background miner to shield some ZEC first.");
-            console.dir(sendResult);
+        if (typeof sendResult?.txid !== 'string' || !sendResult.txid.trim()) {
+            throw new Error('Faucet /send returned no transaction ID');
         }
 
-        console.log("🎉 Run completed successfully! The regtest network processed the request.");
+        console.log(`📜 TXID: ${sendResult.txid}`);
+        if (sendResult.status) console.log(`   Status: ${sendResult.status}`);
+        console.log("Faucet transfer request succeeded.");
 
     } catch (e) {
         console.error("\n❌ ERROR:", e.message);

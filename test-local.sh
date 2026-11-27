@@ -2,8 +2,7 @@
 # ============================================================
 # Local Test Script for ZecKit Sample Repo
 # ============================================================
-# This script runs the ZecKit E2E suite using the local
-# ZecKit project at /mnt/data/Projects/ZecKit.
+# Run from the sample repository root with the ZecKit checkout at ../ZecKit.
 # ============================================================
 
 set -e
